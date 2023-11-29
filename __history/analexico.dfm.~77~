@@ -12,6 +12,7 @@ object Form1: TForm1
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poDesigned
+  OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
     Left = 8
@@ -48,6 +49,7 @@ object Form1: TForm1
     Height = 23
     CharCase = ecUpperCase
     TabOrder = 0
+    OnKeyPress = edtPalavraKeyPress
   end
   object btnAddPalavra: TButton
     Left = 176
@@ -80,6 +82,7 @@ object Form1: TForm1
     CharCase = ecUpperCase
     TabOrder = 3
     OnChange = edtVerificaChange
+    OnKeyPress = edtVerificaKeyPress
   end
   object sgdEstados: TStringGrid
     Left = 257
@@ -88,9 +91,11 @@ object Form1: TForm1
     Height = 383
     ColCount = 27
     DefaultColWidth = 40
+    Enabled = False
     RowCount = 1
     FixedRows = 0
     TabOrder = 4
+    OnDrawCell = sgdEstadosDrawCell
   end
   object dbgVerif: TDBGrid
     Left = 8
@@ -119,6 +124,15 @@ object Form1: TForm1
     ParentFont = False
     ReadOnly = True
     TabOrder = 6
+  end
+  object btnLimpar: TButton
+    Left = 152
+    Top = 279
+    Width = 99
+    Height = 25
+    Caption = 'Limpar Palavras'
+    TabOrder = 7
+    OnClick = btnLimparClick
   end
   object cdsPalavras: TClientDataSet
     PersistDataPacket.Data = {

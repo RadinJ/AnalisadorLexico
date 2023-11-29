@@ -1,8 +1,8 @@
 object Form1: TForm1
   Left = 368
   Top = 233
-  Width = 1416
-  Height = 487
+  Width = 1733
+  Height = 486
   AutoScroll = True
   Caption = 'Analisador L'#233'xico'
   Color = clBtnFace
@@ -11,8 +11,10 @@ object Form1: TForm1
   Font.Height = -12
   Font.Name = 'Segoe UI'
   Font.Style = []
+  OldCreateOrder = True
   Position = poDesigned
   OnShow = FormShow
+  PixelsPerInch = 96
   TextHeight = 15
   object Label1: TLabel
     Left = 8
@@ -29,8 +31,8 @@ object Form1: TForm1
     Caption = 'Verificar'
   end
   object Verificados: TLabel
-    Left = 8
-    Top = 315
+    Left = 1416
+    Top = 7
     Width = 57
     Height = 15
     Caption = 'Verificados'
@@ -64,7 +66,7 @@ object Form1: TForm1
     Left = 8
     Top = 58
     Width = 243
-    Height = 215
+    Height = 350
     DataSource = srcPalavras
     ReadOnly = True
     TabOrder = 2
@@ -86,7 +88,7 @@ object Form1: TForm1
   end
   object sgdEstados: TStringGrid
     Left = 257
-    Top = 58
+    Top = 59
     Width = 1139
     Height = 383
     ColCount = 27
@@ -98,10 +100,10 @@ object Form1: TForm1
     OnDrawCell = sgdEstadosDrawCell
   end
   object dbgVerif: TDBGrid
-    Left = 8
-    Top = 336
-    Width = 243
-    Height = 105
+    Left = 1416
+    Top = 28
+    Width = 293
+    Height = 411
     DataSource = srcVerifs
     TabOrder = 5
     TitleFont.Charset = DEFAULT_CHARSET
@@ -126,9 +128,9 @@ object Form1: TForm1
     TabOrder = 6
   end
   object btnLimpar: TButton
-    Left = 152
-    Top = 279
-    Width = 99
+    Left = 8
+    Top = 414
+    Width = 243
     Height = 25
     Caption = 'Limpar Palavras'
     TabOrder = 7

@@ -2,8 +2,8 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2023/11/10 09:15:36.000.119,=C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2023/11/10 09:52:54.000.562,C:\Users\JOAO\Desktop\formais\analexico.pas=C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Unit1.pas</Transaction>
-    <Transaction>2023/11/10 09:52:54.000.562,C:\Users\JOAO\Desktop\formais\analexico.dfm=C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
-    <Transaction>2023/11/10 09:53:19.000.131,C:\Users\JOAO\Desktop\formais\analisadorlexico.dproj=C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Project1.dproj</Transaction>
+    <Transaction>2023/11/10 09:52:54.000.562,C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Unit1.pas=C:\Users\JOAO\Desktop\formais\analexico.pas</Transaction>
+    <Transaction>2023/11/10 09:52:54.000.562,C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Unit1.dfm=C:\Users\JOAO\Desktop\formais\analexico.dfm</Transaction>
+    <Transaction>2023/11/10 09:53:19.000.131,C:\Users\JOAO\Documents\Embarcadero\Studio\Projects\Project1.dproj=C:\Users\JOAO\Desktop\formais\analisadorlexico.dproj</Transaction>
   </Transactions>
 </BorlandProject>

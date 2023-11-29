@@ -264,7 +264,10 @@ var
   begin
     for r := 1 to Length(palavra) do
     begin
-      if sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r) then
+      if (sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r) + '(*)') and (r = Length(palavra)) then
+        sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] := 'q' + IntToStr(r) + '(*)';
+      if (sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r)) and
+         (sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r) + '(*)') then
         if r = Length(palavra) then
           sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] := 'q' + IntToStr(r) + '(*)'
         else

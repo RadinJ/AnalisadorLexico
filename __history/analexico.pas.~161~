@@ -27,6 +27,7 @@ type
     cdsVerifsOK: TBooleanField;
     edtEstado: TEdit;
     Label3: TLabel;
+    btnLimpar: TButton;
     procedure btnAddPalavraClick(Sender: TObject);
     procedure edtVerificaChange(Sender: TObject);
     procedure dbgEstadosDrawDataCell(Sender: TObject; const Rect: TRect;
@@ -37,6 +38,8 @@ type
       Rect: TRect; State: TGridDrawState);
     procedure edtPalavraKeyPress(Sender: TObject; var Key: Char);
     procedure edtVerificaKeyPress(Sender: TObject; var Key: Char);
+    procedure btnLimparClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     procedure MontaEstados;
@@ -53,18 +56,45 @@ implementation
 {$R *.dfm}
 
 procedure TForm1.btnAddPalavraClick(Sender: TObject);
+var
+  bm: TBookmark;
 begin
   if Trim(edtPalavra.Text) = '' then
   begin
     ShowMessage('Informe uma palavra!');
     Exit;
   end;
-  cdsPalavras.Append;
-  cdsPalavrasPALAVRA.AsString := edtPalavra.Text;
-  cdsPalavras.Post;
+  bm := cdsPalavras.GetBookmark;
+  try
+    cdsPalavras.DisableControls;
+    cdsPalavras.First;
+    while not cdsPalavras.Eof do
+    begin
+      if cdsPalavrasPALAVRA.AsString = edtPalavra.Text then
+      begin
+        ShowMessage('Palavra já existe');
+        Exit;
+      end;
+      cdsPalavras.Next;
+    end;
+    cdsPalavras.Append;
+    cdsPalavrasPALAVRA.AsString := edtPalavra.Text;
+    cdsPalavras.Post;
 
-  edtPalavra.Text := '';
+    edtPalavra.Text := '';
 
+    MontaEstados;
+  finally
+    cdsPalavras.GotoBookmark(bm);
+    cdsPalavras.EnableControls;
+    cdsPalavras.FreeBookmark(bm);
+  end;
+end;
+
+procedure TForm1.btnLimparClick(Sender: TObject);
+begin
+  cdsPalavras.EmptyDataSet;
+  cdsVerifs.EmptyDataSet;
   MontaEstados;
 end;
 
@@ -174,12 +204,13 @@ begin
         cdsVerifsPALAVRA.AsString := Copy(edtVerifica.Text, 1, iLgt - 1);
         cdsVerifsOK.AsBoolean := iCont > 0;
         cdsVerifs.Post;
+        edtVerifica.Text := '';
+        sgdEstados.Row := 1;
+        sgdEstados.Row := 0;
         if cdsVerifsOK.AsBoolean then
           ShowMessage('A palavra "' + cdsVerifsPALAVRA.AsString + '" é válida!')
         else
           ShowMessage('A palavra "' + cdsVerifsPALAVRA.AsString + '" não é válida!');
-        edtVerifica.Text := '';
-        sgdEstados.Row := 0;
       finally
         cdsPalavras.GotoBookmark(bm);
         cdsPalavras.EnableControls;
@@ -201,6 +232,11 @@ begin
   begin
     Key := #0;
   end;
+end;
+
+procedure TForm1.FormShow(Sender: TObject);
+begin
+  MontaEstados;
 end;
 
 function TForm1.RetornaNroLetra(letra: Char): Integer;
@@ -228,7 +264,10 @@ var
   begin
     for r := 1 to Length(palavra) do
     begin
-      if sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r) then
+      if (sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r)) and (r = Length(palavra)) then
+        sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] := 'q' + IntToStr(r) + '(*)'
+      if (sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r)) and
+         (sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r) + '(*)') then
         if r = Length(palavra) then
           sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] := 'q' + IntToStr(r) + '(*)'
         else
