@@ -16,46 +16,31 @@ type
     cdsPalavrasPALAVRA: TStringField;
     srcPalavras: TDataSource;
     DBGrid1: TDBGrid;
-    cdsEstado: TClientDataSet;
-    srcEstado: TDataSource;
-    dbgEstados: TDBGrid;
-    cdsEstadoA: TStringField;
-    cdsEstadoB: TStringField;
-    cdsEstadoC: TStringField;
-    cdsEstadoD: TStringField;
-    cdsEstadoE: TStringField;
-    cdsEstadoF: TStringField;
-    cdsEstadoG: TStringField;
-    cdsEstadoH: TStringField;
-    cdsEstadoI: TStringField;
-    cdsEstadoJ: TStringField;
-    cdsEstadoK: TStringField;
-    cdsEstadoL: TStringField;
-    cdsEstadoM: TStringField;
-    cdsEstadoN: TStringField;
-    cdsEstadoO: TStringField;
-    cdsEstadoP: TStringField;
-    cdsEstadoQ: TStringField;
-    cdsEstadoR: TStringField;
-    cdsEstadoS: TStringField;
-    cdsEstadoT: TStringField;
-    cdsEstadoU: TStringField;
-    cdsEstadoV: TStringField;
-    cdsEstadoW: TStringField;
-    cdsEstadoX: TStringField;
-    cdsEstadoY: TStringField;
-    cdsEstadoZ: TStringField;
-    cdsEstadoID: TStringField;
     edtVerifica: TEdit;
     Label2: TLabel;
+    sgdEstados: TStringGrid;
+    Verificados: TLabel;
+    dbgVerif: TDBGrid;
+    cdsVerifs: TClientDataSet;
+    srcVerifs: TDataSource;
+    cdsVerifsPALAVRA: TStringField;
+    cdsVerifsOK: TBooleanField;
+    edtEstado: TEdit;
+    Label3: TLabel;
     procedure btnAddPalavraClick(Sender: TObject);
     procedure edtVerificaChange(Sender: TObject);
     procedure dbgEstadosDrawDataCell(Sender: TObject; const Rect: TRect;
       Field: TField; State: TGridDrawState);
-    procedure srcEstadoDataChange(Sender: TObject; Field: TField);
+    procedure dbgVerifDrawColumnCell(Sender: TObject; const Rect: TRect;
+      DataCol: Integer; Column: TColumn; State: TGridDrawState);
+    procedure sgdEstadosDrawCell(Sender: TObject; ACol, ARow: Integer;
+      Rect: TRect; State: TGridDrawState);
+    procedure edtPalavraKeyPress(Sender: TObject; var Key: Char);
+    procedure edtVerificaKeyPress(Sender: TObject; var Key: Char);
   private
     { Private declarations }
     procedure MontaEstados;
+    function RetornaNroLetra(letra: Char): Integer;
   public
     { Public declarations }
   end;
@@ -68,19 +53,39 @@ implementation
 {$R *.dfm}
 
 procedure TForm1.btnAddPalavraClick(Sender: TObject);
+var
+  bm: TBookmark;
 begin
   if Trim(edtPalavra.Text) = '' then
   begin
     ShowMessage('Informe uma palavra!');
     Exit;
   end;
-  cdsPalavras.Append;
-  cdsPalavrasPALAVRA.AsString := edtPalavra.Text;
-  cdsPalavras.Post;
+  bm := cdsPalavras.GetBookmark;
+  try
+    cdsPalavras.DisableControls;
+    cdsPalavras.First;
+    while not cdsPalavras.Eof do
+    begin
+      if cdsPalavrasPALAVRA.AsString = edtPalavra.Text then
+      begin
+        ShowMessage('Palavra já existe');
+        Exit;
+      end;
+      cdsPalavras.Next;
+    end;
+    cdsPalavras.Append;
+    cdsPalavrasPALAVRA.AsString := edtPalavra.Text;
+    cdsPalavras.Post;
 
-  edtPalavra.Text := '';
+    edtPalavra.Text := '';
 
-  MontaEstados;
+    MontaEstados;
+  finally
+    cdsPalavras.GotoBookmark(bm);
+    cdsPalavras.EnableControls;
+    cdsPalavras.FreeBookmark(bm);
+  end;
 end;
 
 procedure TForm1.dbgEstadosDrawDataCell(Sender: TObject; const Rect: TRect;
@@ -89,54 +94,165 @@ begin
   ShowMEssage('teste');
 end;
 
+procedure TForm1.dbgVerifDrawColumnCell(Sender: TObject; const Rect: TRect;
+  DataCol: Integer; Column: TColumn; State: TGridDrawState);
+begin
+  if cdsVerifsOK.AsBoolean then
+    dbgVerif.Canvas.Brush.Color := clGreen
+  else if cdsVerifsOK.IsNull then
+    dbgVerif.Canvas.Brush.Color := clWhite
+  else
+    dbgVerif.Canvas.Brush.Color := clRed;
+  dbgVerif.Canvas.FillRect(Rect);
+  dbgVerif.DefaultDrawColumnCell(Rect, DataCol, Column, State);
+end;
+
+procedure TForm1.edtPalavraKeyPress(Sender: TObject; var Key: Char);
+begin
+  if not (Key in ['A'..'Z', 'a'..'z', #8]) then
+  begin
+    Key := #0;
+  end;
+end;
+
 procedure TForm1.edtVerificaChange(Sender: TObject);
 var
-  iCont : Integer;
+  iLgt, iCont, iFinal : Integer;
+  bm : TBookmark;
 begin
-  iCont := Length(edtVerifica.Text);
-  if iCont = 1 then
-    cdsEstado.First
+  iCont := 0;
+  iFinal := 0;
+  iLgt := Length(edtVerifica.Text);
+
+  if edtVerifica.Text <> '' then
+  begin
+    if edtVerifica.Text = ' ' then
+    begin
+      ShowMessage('É preciso informar uma palavra para fazer a verificação, o texto será apagado automaticamente.');
+      edtVerifica.Text := '';
+    end
+    else if edtVerifica.Text[iLgt] <> ' ' then
+    begin
+      bm := cdsPalavras.GetBookmark;
+      try
+        cdsPalavras.DisableControls;
+        cdsPalavras.First;
+        while not cdsPalavras.Eof do
+        begin
+          if Copy(cdsPalavrasPALAVRA.AsString, 1, iLgt) = edtVerifica.Text then
+            Inc(iCont);
+          if cdsPalavrasPALAVRA.AsString = edtVerifica.Text then
+            Inc(iFinal);
+          cdsPalavras.Next;
+        end;
+        if iCont = 0 then
+        begin
+          edtEstado.Text := 'ERRO';
+          edtEstado.Color := clRed;
+        end
+        else
+        begin
+          if (iCont = 1) and (iFinal = 1) then
+            edtEstado.Text := 'q' + IntToStr(iLgt) + '*'
+          else if (iCont > 1) and (iFinal = 1) then
+            edtEstado.Text := 'q' + IntToStr(iLgt) + '(*)'
+          else
+            edtEstado.Text := 'q' + IntToStr(iLgt);
+          edtEstado.Color := clGreen;
+        end;
+        sgdEstados.Options := sgdEstados.Options + [goRowSelect];
+        if iLgt <= sgdEstados.RowCount - 1 then
+          sgdEstados.Row := iLgt
+        else
+          sgdEstados.Row := 0;
+        sgdEstados.Options := sgdEstados.Options - [goRowSelect];
+      finally
+        cdsPalavras.GotoBookmark(bm);
+        cdsPalavras.EnableControls;
+        cdsPalavras.FreeBookmark(bm);
+      end;
+    end
+    else
+    begin
+      //verifica
+      bm := cdsPalavras.GetBookmark;
+      try
+        cdsPalavras.DisableControls;
+        cdsPalavras.First;
+        while not cdsPalavras.Eof do
+        begin
+          if cdsPalavrasPALAVRA.AsString = Copy(edtVerifica.Text, 1, iLgt - 1) then
+          begin
+            Inc(iCont);
+            Break;
+          end;
+          cdsPalavras.Next;
+        end;
+        edtEstado.Text := '';
+        edtEstado.Color := clWindow;
+        cdsVerifs.Append;
+        cdsVerifsPALAVRA.AsString := Copy(edtVerifica.Text, 1, iLgt - 1);
+        cdsVerifsOK.AsBoolean := iCont > 0;
+        cdsVerifs.Post;
+        edtVerifica.Text := '';
+        sgdEstados.Row := 0;
+        if cdsVerifsOK.AsBoolean then
+          ShowMessage('A palavra "' + cdsVerifsPALAVRA.AsString + '" é válida!')
+        else
+          ShowMessage('A palavra "' + cdsVerifsPALAVRA.AsString + '" não é válida!');
+      finally
+        cdsPalavras.GotoBookmark(bm);
+        cdsPalavras.EnableControls;
+        cdsPalavras.FreeBookmark(bm);
+      end;
+    end
+  end
   else
   begin
-    cdsEstado.Next;
-    dbgEstados.Refresh;
-//    dbgEstados.Col :=
-    if cdsEstado.FieldByName(edtVerifica.Text[iCont]).AsString <> '' then
-
+    edtEstado.Text := '';
+    edtEstado.Color := clWindow;
+    sgdEstados.Row := 0;
   end;
+end;
+
+procedure TForm1.edtVerificaKeyPress(Sender: TObject; var Key: Char);
+begin
+  if not (Key in ['A'..'Z', 'a'..'z', ' ', #8]) then
+  begin
+    Key := #0;
+  end;
+end;
+
+function TForm1.RetornaNroLetra(letra: Char): Integer;
+begin
+  if (letra >= 'A') and (letra <= 'Z') then
+    Result := Ord(letra) - Ord('A') + 1;
+end;
+
+
+procedure TForm1.sgdEstadosDrawCell(Sender: TObject; ACol, ARow: Integer;
+  Rect: TRect; State: TGridDrawState);
+begin
+  sgdEstados.Canvas.Brush.Color := edtEstado.Color;
 end;
 
 procedure TForm1.MontaEstados;
 var
   bm: TBookmark;
   lgtMaior: Integer;
-  i: Integer;
+  i, j: Integer;
 
   procedure AdicionaPalavra(palavra: String);
   var
-    i: Integer;
+    r, c, lgtPalavra: Integer;
   begin
-    if not cdsEstado.IsEmpty then
-      cdsEstado.First;
-    for i := 1 to Length(palavra) do
+    for r := 1 to Length(palavra) do
     begin
-      if not cdsEstado.Eof then
-      begin
-        cdsEstado.Edit;
-        if cdsEstado.FieldByName(UpperCase(palavra[i])).AsString = '' then
-          cdsEstado.FieldByName(UpperCase(palavra[i])).AsString := 'q' + IntToStr(i);
-        if i = Length(palavra) then
-          cdsEstado.FieldByName(UpperCase(palavra[i])).AsString := 'q' + IntToStr(i) + '(*)';
-      end
-      else
-      begin
-        cdsEstado.Append;
-        if i = Length(palavra) then
-          cdsEstado.FieldByName(UpperCase(palavra[i])).AsString := 'q' + IntToStr(i) + '(*)'
+      if sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] <> 'q' + IntToStr(r) then
+        if r = Length(palavra) then
+          sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] := 'q' + IntToStr(r) + '(*)'
         else
-          cdsEstado.FieldByName(UpperCase(palavra[i])).AsString := 'q' + IntToStr(i);
-      end;
-      cdsEstado.Next;
+          sgdEstados.Cells[RetornaNroLetra(palavra[r]), r] := 'q' + IntToStr(r);
     end;
   end;
 
@@ -145,8 +261,7 @@ begin
   try
     cdsPalavras.DisableControls;
     lgtMaior := 0;
-    cdsEstado.EmptyDataSet;
-    // definir o tamanho total da maq
+    // definir o nro de estados
     cdsPalavras.First;
     while not cdsPalavras.Eof do
     begin
@@ -155,21 +270,20 @@ begin
 
       cdsPalavras.Next;
     end;
-    cdsEstado.First;
-    for i := 1 to lgtMaior do
+    sgdEstados.RowCount := lgtMaior + 1;
+    for i := 1 to sgdEstados.ColCount do
     begin
-      if cdsEstado.Eof then
-        cdsEstado.Append
-      else
-        cdsEstado.Edit;
-      cdsEstadoID.AsString := IntToStr(i);
-      cdsEstado.Post;
-      cdsEstado.Next;
+      for j := 0 to lgtMaior + 1 do
+        sgdEstados.Cells[i, j] := '';
+      sgdEstados.Cells[i, 0] := Chr(Ord('A') - 1 + i);
     end;
+    for i := 1 to lgtMaior do
+      sgdEstados.Cells[0, i] := IntToStr(i);
     // construção dos estados
     cdsPalavras.First;
     while not cdsPalavras.Eof do
     begin
+
       AdicionaPalavra(cdsPalavrasPALAVRA.AsString);
 
       cdsPalavras.Next;
@@ -179,11 +293,6 @@ begin
     cdsPalavras.EnableControls;
     cdsPalavras.FreeBookmark(bm);
   end;
-end;
-
-procedure TForm1.srcEstadoDataChange(Sender: TObject; Field: TField);
-begin
-  dbgEstados.Refresh;
 end;
 
 end.
