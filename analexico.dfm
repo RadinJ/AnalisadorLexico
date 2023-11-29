@@ -12,6 +12,7 @@ object Form1: TForm1
   Font.Name = 'Segoe UI'
   Font.Style = []
   Position = poDesigned
+  OnShow = FormShow
   TextHeight = 15
   object Label1: TLabel
     Left = 8
@@ -90,6 +91,7 @@ object Form1: TForm1
     Height = 383
     ColCount = 27
     DefaultColWidth = 40
+    Enabled = False
     RowCount = 1
     FixedRows = 0
     TabOrder = 4
@@ -122,6 +124,15 @@ object Form1: TForm1
     ParentFont = False
     ReadOnly = True
     TabOrder = 6
+  end
+  object btnLimpar: TButton
+    Left = 152
+    Top = 279
+    Width = 99
+    Height = 25
+    Caption = 'Limpar Palavras'
+    TabOrder = 7
+    OnClick = btnLimparClick
   end
   object cdsPalavras: TClientDataSet
     PersistDataPacket.Data = {

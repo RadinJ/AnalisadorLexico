@@ -27,6 +27,7 @@ type
     cdsVerifsOK: TBooleanField;
     edtEstado: TEdit;
     Label3: TLabel;
+    btnLimpar: TButton;
     procedure btnAddPalavraClick(Sender: TObject);
     procedure edtVerificaChange(Sender: TObject);
     procedure dbgEstadosDrawDataCell(Sender: TObject; const Rect: TRect;
@@ -37,6 +38,8 @@ type
       Rect: TRect; State: TGridDrawState);
     procedure edtPalavraKeyPress(Sender: TObject; var Key: Char);
     procedure edtVerificaKeyPress(Sender: TObject; var Key: Char);
+    procedure btnLimparClick(Sender: TObject);
+    procedure FormShow(Sender: TObject);
   private
     { Private declarations }
     procedure MontaEstados;
@@ -86,6 +89,13 @@ begin
     cdsPalavras.EnableControls;
     cdsPalavras.FreeBookmark(bm);
   end;
+end;
+
+procedure TForm1.btnLimparClick(Sender: TObject);
+begin
+  cdsPalavras.EmptyDataSet;
+  cdsVerifs.EmptyDataSet;
+  MontaEstados;
 end;
 
 procedure TForm1.dbgEstadosDrawDataCell(Sender: TObject; const Rect: TRect;
@@ -195,6 +205,7 @@ begin
         cdsVerifsOK.AsBoolean := iCont > 0;
         cdsVerifs.Post;
         edtVerifica.Text := '';
+        sgdEstados.Row := 1;
         sgdEstados.Row := 0;
         if cdsVerifsOK.AsBoolean then
           ShowMessage('A palavra "' + cdsVerifsPALAVRA.AsString + '" é válida!')
@@ -221,6 +232,11 @@ begin
   begin
     Key := #0;
   end;
+end;
+
+procedure TForm1.FormShow(Sender: TObject);
+begin
+  MontaEstados;
 end;
 
 function TForm1.RetornaNroLetra(letra: Char): Integer;

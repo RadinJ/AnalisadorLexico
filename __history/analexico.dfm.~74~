@@ -34,6 +34,13 @@ object Form1: TForm1
     Height = 15
     Caption = 'Verificados'
   end
+  object Label3: TLabel
+    Left = 592
+    Top = 8
+    Width = 35
+    Height = 15
+    Caption = 'Estado'
+  end
   object edtPalavra: TEdit
     Left = 8
     Top = 29
@@ -41,6 +48,7 @@ object Form1: TForm1
     Height = 23
     CharCase = ecUpperCase
     TabOrder = 0
+    OnKeyPress = edtPalavraKeyPress
   end
   object btnAddPalavra: TButton
     Left = 176
@@ -73,6 +81,7 @@ object Form1: TForm1
     CharCase = ecUpperCase
     TabOrder = 3
     OnChange = edtVerificaChange
+    OnKeyPress = edtVerificaKeyPress
   end
   object sgdEstados: TStringGrid
     Left = 257
@@ -84,6 +93,7 @@ object Form1: TForm1
     RowCount = 1
     FixedRows = 0
     TabOrder = 4
+    OnDrawCell = sgdEstadosDrawCell
   end
   object dbgVerif: TDBGrid
     Left = 8
@@ -97,6 +107,21 @@ object Form1: TForm1
     TitleFont.Height = -12
     TitleFont.Name = 'Segoe UI'
     TitleFont.Style = []
+    OnDrawColumnCell = dbgVerifDrawColumnCell
+  end
+  object edtEstado: TEdit
+    Left = 592
+    Top = 29
+    Width = 121
+    Height = 23
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWhite
+    Font.Height = -12
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold]
+    ParentFont = False
+    ReadOnly = True
+    TabOrder = 6
   end
   object cdsPalavras: TClientDataSet
     PersistDataPacket.Data = {
@@ -148,10 +173,12 @@ object Form1: TForm1
     Left = 696
     Top = 232
     object cdsVerifsPALAVRA: TStringField
+      DisplayLabel = 'Entrada'
       FieldName = 'PALAVRA'
     end
     object cdsVerifsOK: TBooleanField
       FieldName = 'OK'
+      Visible = False
     end
   end
   object srcVerifs: TDataSource
